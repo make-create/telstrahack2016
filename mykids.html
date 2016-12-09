@@ -37,6 +37,11 @@
         width: 100%; 
         padding-bottom: 10px;
       }
+      .kids .row a[disabled] img {
+        opacity: 0.7;
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+      }
     </style>
   </head>
   <body>
@@ -47,7 +52,7 @@
         <img src="images/xavier.png">
         Xavier
       </a>
-      <a class="col-md-3">
+      <a class="col-md-3" disabled="disabled">
         <img src="images/jenny.png">
         Jenny
       </a>

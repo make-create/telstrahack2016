@@ -26,7 +26,7 @@
     <!-- Scripts -->
       <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
       <script type="text/javascript">
-        var mymap = L.map('mapid').setView([8.505, 105.09], 6);
+        var mymap = L.map('mapid').setView([9.505, 105.09], 6);
         document.getElementById('mapid').style.width = window.innerWidth + 'px';
         document.getElementById('mapid').style.height = window.innerHeight + 'px';
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -35,6 +35,18 @@
           id: 'sdesalas.2b2j1abg',
           accessToken: 'tk.eyJ1Ijoic2Rlc2FsYXMiLCJleHAiOjE0ODEyODcxNTEsImlhdCI6MTQ4MTI4MzU1MCwic2NvcGVzIjpbIm1hcDpyZWFkIiwibWFwOndyaXRlIiwidXNlcjpyZWFkIiwiZGF0YXNldHM6cmVhZCIsImRhdGFzZXRzOndyaXRlIl0sImNsaWVudCI6Im1hcGJveC5jb20iLCJsbCI6MTQ4MTI4MzMwODM0OSwiaXUiOm51bGx9.q-mBcgLlDjUc69STMrjOLQ'
         }).addTo(mymap);
+        var events = [];
+        var pos = [9.505, 105.09];
+        for (var i = 0; i < 80; i++) {
+          pos[0] = pos[0] + (Math.random() - 0.5);
+          pos[1] = pos[1] + (Math.random() - 0.5);
+          events.push(pos);
+        }
+        events.forEach(function(event) {
+          var marker = L.marker(event).addTo(mymap);
+          marker.bindPopup("<b>Hello world!</b><br>I am a popup.")
+        });
+
       </script>
   </body>
 </html>
