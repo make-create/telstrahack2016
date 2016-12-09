@@ -37,11 +37,9 @@
         var mymap = L.map('mapid').setView(lastKnown, 7);
         document.getElementById('mapid').style.width = window.innerWidth + 'px';
         document.getElementById('mapid').style.height = window.innerHeight + 'px';
-        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '',
           maxZoom: 18,
-          id: 'sdesalas.2b2j1abg',
-          accessToken: 'tk.eyJ1Ijoic2Rlc2FsYXMiLCJleHAiOjE0ODEyODcxNTEsImlhdCI6MTQ4MTI4MzU1MCwic2NvcGVzIjpbIm1hcDpyZWFkIiwibWFwOndyaXRlIiwidXNlcjpyZWFkIiwiZGF0YXNldHM6cmVhZCIsImRhdGFzZXRzOndyaXRlIl0sImNsaWVudCI6Im1hcGJveC5jb20iLCJsbCI6MTQ4MTI4MzMwODM0OSwiaXUiOm51bGx9.q-mBcgLlDjUc69STMrjOLQ'
         }).addTo(mymap);
         var marker;
         var pos = lastKnown.slice();
