@@ -61,14 +61,17 @@
 new Vue({
   el: '#send-sms',
   data: {
-    msg: 'Houston we have a problem.'
+    msg: "Hello, we haven't heard back from Xavier for a while, check out this url for more info: http://bit.ly/2hfoV39."
   },
   methods: {
     send: function() {
-      console.log('send', this, arguments);
+      console.log('send', this.msg);
       $ajax.post({
-        url: 'http://api.location.com',
+        url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/send-sms-api',
         dataType: 'json',
+        data: {
+          message: this.msg;
+        },
         success: function(data) {
           console.log('DONE');
         }
