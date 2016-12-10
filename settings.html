@@ -44,7 +44,7 @@
       </div>
       <div class="form-group">
         <div class="col-sm-10 col-sm-offset-2">
-          Alert!
+          {{status}}
         </div>
       </div>
 
@@ -61,20 +61,25 @@
 new Vue({
   el: '#send-sms',
   data: {
-    msg: "Hello, we haven't heard back from Xavier for a while, check out this url for more info: http://bit.ly/2hfoV39."
+    msg: "Hello, we haven't heard back from Xavier for a while, check out this url for more info: http://bit.ly/2hfoV39.",
+    status: ''
   },
   methods: {
     send: function() {
-      console.log('send', this.msg);
+      console.log('send', this.msg, arguments);
       $ajax.post({
         url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/send-sms-api',
         dataType: 'json',
         data: {
-          message: this.msg;
+          message: this.msg
         },
-        success: function(data) {
-          console.log('DONE');
-        }
+        complete: (function(data) {
+          console.log('DONE',arguments);
+          if (typeof data === 'object') {
+            data = JSON.stringify(data);
+          }
+          this.status = data;
+        }).bind(this)
       });
     }
   }

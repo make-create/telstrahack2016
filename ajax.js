@@ -18,7 +18,7 @@ $ajax = {
         }
       }
       xhr.open(opts.method, opts.url, true);
-      xhr.send(typeof data.data === 'object' ? JSON.stringify(data.data) : String(data));
+      xhr.send(typeof opts.data === 'object' ? JSON.stringify(opts.data) : String(opts));
     }
   }
 };
