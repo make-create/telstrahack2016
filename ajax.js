@@ -8,7 +8,6 @@ $ajax = {
       var xhr = new XMLHttpRequest();
       xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {
-          console.log('DONE', xhr.responseText);
           var data = xhr.responseText;
           if (opts.dataType.toLowerCase() === 'json') {
             try {
