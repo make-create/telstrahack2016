@@ -48,16 +48,17 @@
 
      </div>
 
-
-
       <h2>Emergency Contacts</h2>
 
 
     <div id="directory" class="card-format">
       <p>These people will be notified if there is a problem.</p>
       <div id="list-group">
-        <a href="#" class="list-group-item" v-for="subscriber in subscribers">
+        <a href="javascript:;" class="list-group-item" v-for="subscriber in subscribers" v-on:click="remove(subscriber)">
           <h4 class="list-group-item-heading">{{subscriber.Endpoint}}</h4>
+        </a>
+        <a href="javascript:;" class="list-group-item" v-on:click="add()">
+          <h4 class="list-group-item-heading">+ Add</h4>
         </a>
       </div>
     </div>
@@ -73,18 +74,55 @@ var directory = new Vue({
   methods: {
     add: function() {
       console.log('add', this.msg, arguments);
+      var number = prompt('What is the mobile number of the emergency contact? (ie +61496828222)');
+      console.log(number);
+      if (number.indexOf('+61') !== 0) {
+        return alert('Please enter a starting with +61');
+      }
+      $ajax.post({
+        url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/sms-manage-subscribers',
+        dataType: 'json',
+        data: {
+          Endpoint: number
+        },
+        success: (function(data) {
+          console.log('DONE', data);
+          this.getAll();
+        }).bind(this)
+      });
+    },
+    remove: function(subscriber) {
+      console.log('remove', this, arguments);
+      if (confirm('Remove emergency contact ' + subscriber.Endpoint + ' ?')) {
+        $ajax.delete({
+          url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/sms-manage-subscribers',
+          dataType: 'json',
+          data: {
+            SubscriptionArn: subscriber.SubscriptionArn
+          },
+          success: (function(data) {
+            console.log('DONE', data, directory);
+            directory.subscribers = data;
+            console.log('directory.subscribers', directory.subscribers);
+          }).bind(this)
+        });
+      }
+    },
+    getAll: function() {
+      $ajax.get({
+        url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/sms-manage-subscribers',
+        dataType: 'json',
+        success: (function(data) {
+          console.log('DONE', data, directory);
+          directory.subscribers = data;
+          console.log('directory.subscribers', directory.subscribers);
+        }).bind(this)
+      });
     }
   }
-})
-$ajax.get({
-  url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/sms-list-subscribers',
-  dataType: 'json',
-  success: (function(data) {
-    console.log('DONE', data, directory);
-    directory.subscribers = data;
-    console.log('directory.subscribers', directory.subscribers);
-  }).bind(this)
 });
+
+directory.getAll();
 
 
 

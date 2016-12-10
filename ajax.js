@@ -2,7 +2,7 @@
 $ajax = {
   request: function(opts) {
     opts = opts || {};
-    console.log('$ajax.request()', opts.url);
+    console.log('$ajax.request()', opts);
     if (opts.url && opts.method) {
       opts.method = opts.method || 'GET';
       var xhr = new XMLHttpRequest();
