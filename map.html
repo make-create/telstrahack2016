@@ -42,56 +42,91 @@
 
       App = {};
 
+      App.init = (function() {
         var lastKnown = {lat: 11.05, long: 105.09};
-        var mymap = L.map('mapid', {zoomControl: false}).setView([lastKnown.lat, lastKnown.long], 7);
+        App.map = L.map('mapid', {zoomControl: false}).setView([lastKnown.lat, lastKnown.long], 7);
         L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '',
           maxZoom: 18,
-        }).addTo(mymap);
+        }).addTo(App.map);
+        setTimeout(App.resizeMap, 1);
+      })();
 
-        var locationData = [
-//{"lat":11.05,"long":105.09,"time":"2016-12-09T07:41:35.412Z"},  // LAST KNOWN
-{"lat":10.709797114802402,"long":105.33215562691426,"time":"2016-12-08T15:41:35.412Z"},
-{"lat":10.29651382767102,"long":105.73727286453364,"time":"2016-12-07T11:41:35.412Z"},
-{"lat":10.584736614037618,"long":105.78181966390942,"time":"2016-12-06T07:41:35.412Z"},
-{"lat":10.358069865773288,"long":105.46792962756278,"time":"2016-12-05T03:41:35.412Z"},
-{"lat":10.614101128457742,"long":105.92195711504108,"time":"2016-12-04T23:41:35.412Z"},
-{"lat":10.89422964626165,"long":106.1795883479868,"time":"2016-12-03T19:41:35.412Z"},
-{"lat":10.788037247049667,"long":106.59048386984685,"time":"2016-12-02T15:41:35.412Z"},
-{"lat":11.151025342183182,"long":106.36867638314023,"time":"2016-12-01T11:41:35.412Z"}
-],
-      lastLocationData = {"contacts":[{"name":"Ambulance","number":"111111"}], "lat":11.05,"long":105.09,"time":"2016-12-09T07:41:35.412Z"};
+      App.data = {
+        location: [{
+          "lat": 10.709797114802402,
+          "long": 105.33215562691426,
+          "time": "2016-12-08T15:41:35.412Z"
+        }, {
+          "lat": 10.29651382767102,
+          "long": 105.73727286453364,
+          "time": "2016-12-07T11:41:35.412Z"
+        }, {
+          "lat": 10.584736614037618,
+          "long": 105.78181966390942,
+          "time": "2016-12-06T07:41:35.412Z"
+        }, {
+          "lat": 10.358069865773288,
+          "long": 105.46792962756278,
+          "time": "2016-12-05T03:41:35.412Z"
+        }, {
+          "lat": 10.614101128457742,
+          "long": 105.92195711504108,
+          "time": "2016-12-04T23:41:35.412Z"
+        }, {
+          "lat": 10.89422964626165,
+          "long": 106.1795883479868,
+          "time": "2016-12-03T19:41:35.412Z"
+        }, {
+          "lat": 10.788037247049667,
+          "long": 106.59048386984685,
+          "time": "2016-12-02T15:41:35.412Z"
+        }, {
+          "lat": 11.151025342183182,
+          "long": 106.36867638314023,
+          "time": "2016-12-01T11:41:35.412Z"
+        }],
+        lastLocation: {
+          "contacts": [{
+            "name": "Ambulance",
+            "number": "111111"
+          }],
+          "lat": 11.05,
+          "long": 105.09,
+          "time": "2016-12-09T07:41:35.412Z"
+        }
+      };
 
 
       App.handlers = {
         locationready: function(data) {
             console.log('App.handlers.locationready', data);
-            data = data || locationData;
+            data = data || App.data.location;
 
             data.forEach(function (pos) {
               var timeAgo = moment(pos.time).fromNow();
-              L.marker([pos.lat, pos.long]).addTo(mymap).bindPopup("<b>" + timeAgo + "</b><br>Checked in.");
+              L.marker([pos.lat, pos.long]).addTo(App.map).bindPopup("<b>" + timeAgo + "</b><br>Checked in.");
               console.log(pos[0], pos[1]);
             });
 
           },
         lastlocationready: function(data) {
           console.log('App.handlers.lastlocationready', data);
-          var lastKnown = data || lastLocationData;
-          mymap.setView([lastKnown.lat, lastKnown.long], 7);
+          var lastKnown = data || App.data.lastLocation;
+          App.map.setView([lastKnown.lat, lastKnown.long], 7);
 
           var circle = L.circle([lastKnown.lat, lastKnown.long], {
               color: 'red',
               fillColor: '#f03',
               fillOpacity: 0.5,
               radius: 50000
-          }).addTo(mymap);
+          }).addTo(App.map);
           L.marker([lastKnown.lat, lastKnown.long], {icon: L.icon({
               iconUrl: 'images/red-marker-icon.png',
               iconSize:     [25, 41], // size of the icon
               iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
               popupAnchor:  [1, -45] // point from which the popup should open relative to the iconAnchor
-          })}).addTo(mymap).bindPopup("<b>" + moment(lastKnown.time).fromNow() + "</b><br>Checked in.");
+          })}).addTo(App.map).bindPopup("<b>" + moment(lastKnown.time).fromNow() + "</b><br>Checked in.");
         }
       };
 
@@ -109,13 +144,13 @@
           success: App.handlers.lastlocationready
         });
 
-  App.resizeMap = function() {
-    document.getElementById('mapid').style.width = window.innerWidth + 'px';
-    document.getElementById('mapid').style.height = window.innerHeight + 'px';
-  };
+      App.resizeMap = function() {
+        document.getElementById('mapid').style.width = window.innerWidth + 'px';
+        document.getElementById('mapid').style.height = window.innerHeight + 'px';
+      };
 
-  window.addEventListener("resize", App.resizeMap, false);
-  App.resizeMap();
+      window.addEventListener("resize", App.resizeMap, false);
+
 
 
       </script>
