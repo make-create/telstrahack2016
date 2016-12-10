@@ -15,15 +15,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+    <script src="ajax.js"></script>
     <style>
       #mapid {width: 100%; height: 800px;}
-      #kid { z-index: 99999; position: absolute; right: 20px; top: 20px; width: 100px; }
+      #back { z-index: 99999; position: absolute; left: 20px; top: 20px; width: 80px; }
+      #back img {width: 100%;}
+      #kid { z-index: 99999; position: absolute; right: 20px; top: 20px; width: 80px; }
       #kid img {width: 100%;}
       #kid p {display: block; position: absolute; width: 200px; height: 60px; right: 124px; top: 29px; padding: 10px 20px; background: #e7e4c8;}
     </style>
   </head>
   <body>
-
+    <a id="back" href="mykids.html">
+      <img src="images/arrow-back-icon.png">
+    </a>
     <div id="kid">
       <img src="images/xavier.png">
       <p>Hmmm.. I should have checked in 5 hours ago.</p>
@@ -33,33 +39,75 @@
     <!-- Scripts -->
       <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
       <script type="text/javascript">
-        var lastKnown = [11.05, 105.09];
-        var mymap = L.map('mapid').setView(lastKnown, 7);
-        document.getElementById('mapid').style.width = window.innerWidth + 'px';
-        document.getElementById('mapid').style.height = window.innerHeight + 'px';
+
+      App = {};
+
+        var lastKnown = {lat: 11.05, long: 105.09};
+        var mymap = L.map('mapid', {zoomControl: false}).setView([lastKnown.lat, lastKnown.long], 7);
         L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '',
           maxZoom: 18,
         }).addTo(mymap);
-        var marker;
-        var pos = lastKnown.slice();
-        for (var i = 0; i < 8; i++) {
-          pos[0] = pos[0] + (Math.random() - 0.5);
-          pos[1] = pos[1] + (Math.random() - 0.5);
-          L.marker(pos).addTo(mymap).bindPopup("<b>Monday 5.34pm AET</b><br>Checked in.")
-        }
-        var circle = L.circle(lastKnown, {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.5,
-            radius: 50000
-        }).addTo(mymap);
-        L.marker(lastKnown, {icon: L.icon({
-            iconUrl: 'images/red-marker-icon.png',
-            iconSize:     [25, 41], // size of the icon
-            iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
-            popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-        })}).addTo(mymap).bindPopup("<b>Monday 5.34pm AET</b><br>Checked in.")
+
+        backupData = [
+{"lat":11.05,"long":105.09,"time":"2016-12-09T07:41:35.412Z"},  // LAST KNOWN
+{"lat":10.709797114802402,"long":105.33215562691426,"time":"2016-12-08T15:41:35.412Z"},
+{"lat":10.29651382767102,"long":105.73727286453364,"time":"2016-12-07T11:41:35.412Z"},
+{"lat":10.584736614037618,"long":105.78181966390942,"time":"2016-12-06T07:41:35.412Z"},
+{"lat":10.358069865773288,"long":105.46792962756278,"time":"2016-12-05T03:41:35.412Z"},
+{"lat":10.614101128457742,"long":105.92195711504108,"time":"2016-12-04T23:41:35.412Z"},
+{"lat":10.89422964626165,"long":106.1795883479868,"time":"2016-12-03T19:41:35.412Z"},
+{"lat":10.788037247049667,"long":106.59048386984685,"time":"2016-12-02T15:41:35.412Z"},
+{"lat":11.151025342183182,"long":106.36867638314023,"time":"2016-12-01T11:41:35.412Z"}
+]
+
+
+      App.handlers = {
+        success: function(data) {
+            console.log('App.handlers.success', data);
+            data = data || backupData;
+            var lastKnown = data.shift();
+            console.log('lastKnown', lastKnown);
+
+            mymap.setView([lastKnown.lat, lastKnown.long], 7);
+
+            var circle = L.circle([lastKnown.lat, lastKnown.long], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 50000
+            }).addTo(mymap);
+            L.marker([lastKnown.lat, lastKnown.long], {icon: L.icon({
+                iconUrl: 'images/red-marker-icon.png',
+                iconSize:     [25, 41], // size of the icon
+                iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+                popupAnchor:  [1, -45] // point from which the popup should open relative to the iconAnchor
+            })}).addTo(mymap).bindPopup("<b>" + moment(lastKnown.time).fromNow() + "</b><br>Checked in.");
+
+            data.forEach(function (pos) {
+              var timeAgo = moment(pos.time).fromNow();
+              L.marker([pos.lat, pos.long]).addTo(mymap).bindPopup("<b>" + timeAgo + "</b><br>Checked in.");
+              console.log(pos[0], pos[1]);
+            });
+
+          }
+      };
+
+
+        // Call API
+        $ajax.get({
+          url: 'http://10.28.0.169::8080/rest/location/test',
+          dataType: 'json',
+          success: App.handlers.success
+        });
+
+  App.resizeMap = function() {
+    document.getElementById('mapid').style.width = window.innerWidth + 'px';
+    document.getElementById('mapid').style.height = window.innerHeight + 'px';
+  };
+
+  window.addEventListener("resize", App.resizeMap, false);
+  App.resizeMap();
 
 
       </script>
