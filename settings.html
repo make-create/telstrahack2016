@@ -18,13 +18,19 @@
     <script src="ajax.js"></script>
     <style>
     .card-format { background: #eee;padding: 20px; margin-bottom: 20px; }
+    #back { z-index: 99999; position: absolute; left: 20px; top: 20px; width: 80px; }
+    #back img {width: 100%;}
     #directory .list-group {  padding: 10px 5%; }
-    #directory h4 { font-size: 26px; text-align: center; }
+    #directory h4 { font-size: 26px; text-align: center; margin: 5px; }
     #in-trouble {  }
     #send-sms { }
     </style>
   </head>
   <body>
+
+<a id="back" class="hidden-xs" href="mykids.html">
+  <img src="images/arrow-back-icon.png">
+</a>
 
 <div class="container">
   <div class="row">
@@ -34,21 +40,18 @@
       <h2>Emergency Contacts</h2>
 
 
-
-
     <div id="directory" class="card-format">
       <p>These people will be notified if there is a problem.</p>
       <div id="list-group">
-        <a href="#" class="list-group-item">
-          <h4 class="list-group-item-heading">+61 423523622</h4>
+        <a href="#" class="list-group-item" v-for="subscriber in subscribers">
+          <h4 class="list-group-item-heading">{{subscriber.Endpoint}}</h4>
         </a>
       </div>
     </div>
 
 <script type="text/javascript">
 
-
-new Vue({
+var directory = new Vue({
   el: '#directory',
   data: {
     newPhone: undefined,
@@ -60,6 +63,17 @@ new Vue({
     }
   }
 })
+$ajax.get({
+  url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/sms-list-subscribers',
+  dataType: 'json',
+  success: (function(data) {
+    console.log('DONE', data, directory);
+    directory.subscribers = data;
+    console.log('directory.subscribers', directory.subscribers);
+  }).bind(this)
+});
+
+
 
 </script>
 
@@ -68,13 +82,13 @@ new Vue({
       <div id="in-trouble" class="card-format">
         <p>Write a SMS message to send to all subscribers</p>
 
-        <button type="button" class="btn btn-danger">Emergency</button>
+        <button type="button" class="btn btn-danger">Emergency - Panic Now</button>
 
-        <button type="button" class="btn btn-success">All Cool</button>
+        <button type="button" class="btn btn-success">All Cool - Take a Chill pill</button>
 
      </div>
 
-           <h2>Notify everyone</h2>
+           <h2>Notify everyone manually</h2>
       <form id="send-sms" class="form-horizontal card-format" role="form" onsubmit="return false;">
 
       <p>Write a SMS message to send to all subscribers</p>
