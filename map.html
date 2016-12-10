@@ -49,8 +49,8 @@
           maxZoom: 18,
         }).addTo(mymap);
 
-        backupData = [
-{"lat":11.05,"long":105.09,"time":"2016-12-09T07:41:35.412Z"},  // LAST KNOWN
+        var locationData = [
+//{"lat":11.05,"long":105.09,"time":"2016-12-09T07:41:35.412Z"},  // LAST KNOWN
 {"lat":10.709797114802402,"long":105.33215562691426,"time":"2016-12-08T15:41:35.412Z"},
 {"lat":10.29651382767102,"long":105.73727286453364,"time":"2016-12-07T11:41:35.412Z"},
 {"lat":10.584736614037618,"long":105.78181966390942,"time":"2016-12-06T07:41:35.412Z"},
@@ -59,30 +59,14 @@
 {"lat":10.89422964626165,"long":106.1795883479868,"time":"2016-12-03T19:41:35.412Z"},
 {"lat":10.788037247049667,"long":106.59048386984685,"time":"2016-12-02T15:41:35.412Z"},
 {"lat":11.151025342183182,"long":106.36867638314023,"time":"2016-12-01T11:41:35.412Z"}
-]
+],
+      lastLocationData = {"contacts":[{"name":"Ambulance","number":"111111"}], "lat":11.05,"long":105.09,"time":"2016-12-09T07:41:35.412Z"};
 
 
       App.handlers = {
-        success: function(data) {
-            console.log('App.handlers.success', data);
-            data = data || backupData;
-            var lastKnown = data.shift();
-            console.log('lastKnown', lastKnown);
-
-            mymap.setView([lastKnown.lat, lastKnown.long], 7);
-
-            var circle = L.circle([lastKnown.lat, lastKnown.long], {
-                color: 'red',
-                fillColor: '#f03',
-                fillOpacity: 0.5,
-                radius: 50000
-            }).addTo(mymap);
-            L.marker([lastKnown.lat, lastKnown.long], {icon: L.icon({
-                iconUrl: 'images/red-marker-icon.png',
-                iconSize:     [25, 41], // size of the icon
-                iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
-                popupAnchor:  [1, -45] // point from which the popup should open relative to the iconAnchor
-            })}).addTo(mymap).bindPopup("<b>" + moment(lastKnown.time).fromNow() + "</b><br>Checked in.");
+        locationready: function(data) {
+            console.log('App.handlers.locationready', data);
+            data = data || locationData;
 
             data.forEach(function (pos) {
               var timeAgo = moment(pos.time).fromNow();
@@ -90,7 +74,25 @@
               console.log(pos[0], pos[1]);
             });
 
-          }
+          },
+        lastlocationready: function(data) {
+          console.log('App.handlers.lastlocationready', data);
+          var lastKnown = data || lastLocationData;
+          mymap.setView([lastKnown.lat, lastKnown.long], 7);
+
+          var circle = L.circle([lastKnown.lat, lastKnown.long], {
+              color: 'red',
+              fillColor: '#f03',
+              fillOpacity: 0.5,
+              radius: 50000
+          }).addTo(mymap);
+          L.marker([lastKnown.lat, lastKnown.long], {icon: L.icon({
+              iconUrl: 'images/red-marker-icon.png',
+              iconSize:     [25, 41], // size of the icon
+              iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+              popupAnchor:  [1, -45] // point from which the popup should open relative to the iconAnchor
+          })}).addTo(mymap).bindPopup("<b>" + moment(lastKnown.time).fromNow() + "</b><br>Checked in.");
+        }
       };
 
 
@@ -98,7 +100,13 @@
         $ajax.get({
           url: 'http://10.28.0.169::8080/rest/location/test',
           dataType: 'json',
-          success: App.handlers.success
+          success: App.handlers.locationready
+        });
+        // Call API
+        $ajax.get({
+          url: 'http://10.28.0.169::8080/rest/lastLocation/test',
+          dataType: 'json',
+          success: App.handlers.lastlocationready
         });
 
   App.resizeMap = function() {
