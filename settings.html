@@ -102,8 +102,7 @@ var directory = new Vue({
           },
           success: (function(data) {
             console.log('DONE', data, directory);
-            directory.subscribers = data;
-            console.log('directory.subscribers', directory.subscribers);
+            this.getAll();
           }).bind(this)
         });
       }
