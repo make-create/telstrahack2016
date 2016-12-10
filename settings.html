@@ -73,7 +73,7 @@ new Vue({
         data: {
           message: this.msg
         },
-        complete: (function(data) {
+        success: (function(data) {
           console.log('DONE',arguments);
           if (typeof data === 'object') {
             data = JSON.stringify(data);
