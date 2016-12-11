@@ -65,9 +65,11 @@
       }
       .kids .row a:hover .message {
         display: block;
+
       }
       .kids .row .in-trouble-danger .message {
         background: #f3d6c2;
+        display: block;
       }
       @media screen and (max-width: 769px) {
         .kids .row a img {
@@ -155,6 +157,7 @@ var inTrouble = new Vue({
 });
 
 inTrouble.getAll();
+setInterval(function() {inTrouble.getAll(); }, 1000);
 
 </script>
     <!-- Scripts -->

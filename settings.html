@@ -86,6 +86,9 @@ var inTrouble = new Vue({
           this.getXavier();
         }).bind(this)
       });
+      if (newStatus === 'danger') {
+        window.sms.send();
+      }
     },
     changeJenny: function() {
       console.log('changeXavier()');
@@ -134,9 +137,6 @@ inTrouble.getAll();
 
 
 </script>
-
-
-http://localhost:8080/rest/status/test/danger
 
       <h2>Emergency Contacts</h2>
 
@@ -248,7 +248,7 @@ directory.getAll();
 <script type="text/javascript">
 
 
-new Vue({
+var sms = new Vue({
   el: '#send-sms',
   data: {
     msg: "Hello, we haven't heard back from Xavier for a while, check out this url for more info: http://bit.ly/2hfoV39.",
