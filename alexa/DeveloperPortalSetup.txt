@@ -1,0 +1,47 @@
+{
+  "intents": [
+    {
+      "intent": "CheckKid",
+      "slots": [
+        {
+          "name": "Kid",
+          "type": "AMAZON.GB_FIRST_NAME"
+        }
+      ]
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    }
+  ]
+}
+
+
+
+CheckKid how is {Kid}
+CheckKid how is {Kid} doing
+CheckKid how is {Kid} going
+CheckKid how {Kid} is doing
+CheckKid how {Kid} is going
+CheckKid check up on {Kid}
+CheckKid what is {Kid} up to
+CheckKid about {Kid}
+
+
+
+arn:aws:lambda:us-east-1:412359335753:function:alexa-skill-check-kid
+
+
+How is [Kids name]?
+
+Check in with your kid when they are travelling.
+
+
+Alexa ask Paranoid parent about Jenny
+
+
+Alexa ask Paranoid parent how Jenny is going.
+
+Alexa ask Paranoid parent how Rob is doing
