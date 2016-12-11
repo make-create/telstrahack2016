@@ -12,9 +12,9 @@
     <!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
     <!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
     <!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
-    <script src="https://unpkg.com/vue@2.1.4/dist/vue.js"></script>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css"/>
+    <script src="assets/js/moment.min.js"></script>
+    <script src="assets/js/vue.js"></script>
     <script src="ajax.js"></script>
     <style>
     .card-format { background: #eee;padding: 20px; margin-bottom: 20px; }
@@ -22,7 +22,11 @@
     #back img {width: 100%;}
     #directory .list-group {  padding: 10px 5%; }
     #directory h4 { font-size: 26px; text-align: center; margin: 5px; }
-    #in-trouble {  }
+    #in-trouble ul { list-style-type: none; text-align: center;}
+    #in-trouble li { padding: 20px 0; }
+    #in-trouble img { border: 3px solid transparent; border-radius: 100px; width: 100%; margin-bottom: 10px; }
+    #in-trouble .in-trouble-danger { border: 3px solid red; }
+    #in-trouble .in-trouble-ok { border: 3px solid green; }
     #send-sms { }
     </style>
   </head>
@@ -37,16 +41,108 @@
     <div class="col-sm-2"></div>
     <div class="col-sm-8">
 
-      <h2>In Trouble</h2>
+      <h2>In Trouble Override</h2>
 
       <div id="in-trouble" class="card-format">
-        <p>Write a SMS message to send to all subscribers</p>
 
-        <button type="button" class="btn btn-danger">Emergency - Panic Now</button>
+        <p>Override current in-trouble settings.</p>
 
-        <button type="button" class="btn btn-success">All Cool - Take a Chill pill</button>
+        <div class="in-trouble-kids">
+          <ul class="row">
+            <li class="col-xs-2">
+              <img src="images/xavier.png" v-on:click="changeXavier" v-bind:class="{'in-trouble-danger' : xavier === 'danger'}">
+              Xavier ({{xavier}})
+            </li>
+            <li class="col-xs-1">
+            </li>
+            <li class="col-xs-2">
+              <img src="images/jenny.png" v-on:click="changeJenny" v-bind:class="{'in-trouble-danger' : jenny === 'danger'}">
+              Jenny ({{jenny}})
+            </li>
+          </ul>
+        </div>
 
      </div>
+
+
+<script type="text/javascript">
+
+var inTrouble = new Vue({
+  el: '#in-trouble',
+  data: {
+    xavier: '',
+    jenny: ''
+  },
+  computed: {
+    dangerClass: function(name) {
+      console.log('dangerClass', arguments);
+      return this[name] === 'danger' ? 'in-trouble-danger' : 'in-trouble-ok';
+    }
+  },
+  methods: {
+    changeXavier: function() {
+      console.log('changeXavier()');
+      var newStatus = this.xavier === 'danger' ? 'ok' : 'danger';
+      $ajax.post({
+        url: 'http://192.168.43.7:8080/rest/status/xavier/' + newStatus,
+        dataType: 'json',
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          this.xavier = data.status;
+          this.getXavier();
+        }).bind(this)
+      });
+    },
+    changeJenny: function() {
+      console.log('changeXavier()');
+      var newStatus = this.jenny === 'danger' ? 'ok' : 'danger';
+      $ajax.post({
+        url: 'http://192.168.43.7:8080/rest/status/jenny/' + newStatus,
+        dataType: 'json',
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          this.jenny = data.status;
+          this.getJenny();
+        }).bind(this)
+      });
+    },
+    getAll: function() {
+      this.getXavier();
+      this.getJenny();
+    },
+    getXavier: function() {
+      $ajax.get({
+        url: 'http://192.168.43.7:8080/rest/status/xavier',
+        dataType: 'json',
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          this.xavier = data.status;
+          console.log({xavier: this.xavier, jenny: this.jenny});
+        }).bind(this)
+      });
+    },
+    getJenny: function() {
+      $ajax.get({
+        url: 'http://192.168.43.7:8080/rest/status/jenny',
+        dataType: 'json',
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          this.jenny = data.status;
+          console.log({xavier: this.xavier, jenny: this.jenny});
+        }).bind(this)
+      });
+    }
+  }
+});
+
+inTrouble.getAll();
+
+
+
+</script>
+
+
+http://localhost:8080/rest/status/test/danger
 
       <h2>Emergency Contacts</h2>
 

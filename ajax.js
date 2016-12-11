@@ -14,7 +14,7 @@ $ajax = {
               data = JSON.parse(data);
             } catch (e) {};
           }
-          return opts.success && opts.success(data);
+          return opts.success && opts.success(data, opts);
         }
       }
       xhr.open(opts.method, opts.url, true);

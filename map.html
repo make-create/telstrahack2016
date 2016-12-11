@@ -149,14 +149,14 @@
 
       // Call API
       $ajax.get({
-        url: 'http://10.28.0.169:8080/rest/location/test',
+        url: 'http://192.168.43.7:8080/rest/location/test',
         dataType: 'json',
         success: App.handlers.locationready
       });
 
       // Call API
       $ajax.get({
-        url: 'http://10.28.0.169:8080/rest/lastLocation/test',
+        url: 'http://192.168.43.7:8080/rest/lastLocation/test',
         dataType: 'json',
         success: App.handlers.lastlocationready
       });
