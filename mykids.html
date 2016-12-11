@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<!--
+  Eventually by HTML5 UP
+  html5up.net | @ajlkn
+  Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>My Kids</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+    <!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css"/>
+    <script src="assets/js/moment.min.js"></script>
+    <script src="assets/js/vue.js"></script>
+    <script src="ajax.js"></script>
+    <style>
+      body {
+        background: #fff;
+        padding-top: 120px;
+      }
+      #logout { z-index: 99999; position: absolute; left: 20px; top: 20px; width: 80px; }
+      #logout img {width: 100%;}
+      .kids .in-trouble-danger img { border: 3px solid red !important }
+      .kids .in-trouble-ok img { border: 3px solid green; }
+      .kids {
+        margin: 0 auto;
+      }
+      .kids .row a {
+        color: #333;
+        text-decoration: none;
+        text-align: center;
+        font-weight: bold;
+        font-size: 24px;
+        cursor: pointer;
+      }
+      .kids .row a:hover {
+        color: #333 !important;
+      }
+      .kids .row a img {
+        width: 100%; 
+        text-align: center;
+        margin-bottom: 10px;
+        border: 3px solid transparent; border-radius: 400px; 
+      }
+      .kids .row a[disabled] img {
+        /*opacity: 0.7;
+        -webkit-filter: grayscale(100%);
+        filter: grayscale(100%); */
+      }
+      .kids .row .message {
+        position: absolute;
+        display: block;
+        background: #cff3bd;
+        font-size: 16px;
+        font-weight: normal;
+        padding: 20px;
+        width: 100%;
+        top: -91px;
+        right: 0;
+        display: none;
+      }
+      .kids .row a:hover .message {
+        display: block;
+
+      }
+      .kids .row .in-trouble-danger .message {
+        background: #f3d6c2;
+        display: block;
+      }
+      @media screen and (max-width: 769px) {
+        .kids .row a img {
+          width: 80px;
+        }
+        .kids .row a {
+          width: 220px;
+          margin-bottom: 40px;
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+
+  <a id="logout" href="index.html">
+    <img src="images/logout.png">
+  </a>
+
+  <div id="in-trouble" class="kids">
+    <div class="row">
+      <a class="col-sm-2"></a>
+      <a class="col-sm-2" href="map.html" v-bind:class="{'in-trouble-danger' : xavier === 'danger'}">
+        <img src="images/xavier.png">
+        Xavier
+        <p class="message">
+          <span v-if="xavier !== 'danger'">Xavier is doing great.</span>
+          <span v-if="xavier === 'danger'">Xavier is in danger, click to see more info.</span>
+        </p>
+      </a>
+      <a class="col-sm-2" disabled="disabled" v-bind:class="{'in-trouble-danger' : jenny === 'danger'}">
+        <img src="images/jenny.png">
+        Jenny
+        <p class="message">
+          <span v-if="jenny !== 'danger'">Jenny is doing great.</span>
+          <span v-if="jenny === 'danger'">Jenny is in danger, click to see more info.</span>
+        </p>
+      </a>
+      <a class="col-sm-2" href="settings.html">
+        <img src="images/gears.png">
+        Settings
+      </a>
+      <a class="col-sm-2"></a>
+      <a class="col-sm-2"></a>
+    </div>
+  </div>
+
+<script type="text/javascript">
+
+var inTrouble = new Vue({
+  el: '#in-trouble',
+  data: {
+    xavier: '',
+    jenny: ''
+  },
+  methods: {
+    getAll: function() {
+      console.log('inTrouble.getAll()')
+      this.getXavier();
+      this.getJenny();
+    },
+    getXavier: function() {
+      $ajax.get({
+        url: 'http://13.54.67.222:8080/rest/status/xavier',
+        dataType: 'json',
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          this.xavier = data.status;
+          console.log({xavier: this.xavier, jenny: this.jenny});
+        }).bind(this)
+      });
+    },
+    getJenny: function() {
+      $ajax.get({
+        url: 'http://13.54.67.222:8080/rest/status/jenny',
+        dataType: 'json',
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          this.jenny = data.status;
+          console.log({xavier: this.xavier, jenny: this.jenny});
+        }).bind(this)
+      });
+    }
+  }
+});
+
+inTrouble.getAll();
+setInterval(function() {inTrouble.getAll(); }, 1000);
+
+</script>
+    <!-- Scripts -->
+      <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+
+  </body>
+</html>

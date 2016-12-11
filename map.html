@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+<!--
+  Eventually by HTML5 UP
+  html5up.net | @ajlkn
+  Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Happy Holidays TM - Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+    <!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+    <!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+    <script src="ajax.js"></script>
+    <style>
+      #mapid {width: 100%; height: 800px;}
+      #back { z-index: 99999; position: absolute; left: 20px; top: 20px; width: 80px; }
+      #back img {width: 100%;}
+      #kid { z-index: 99999; position: absolute; right: 20px; top: 20px; width: 80px; }
+      #kid img {width: 100%;}
+      #kid p {display: block; position: absolute; width: 200px; height: 60px; right: 124px; top: 29px; padding: 10px 20px; background: #e7e4c8;}
+      #rightpane {
+        width: 200px;
+        background: #e7e4c8;
+      }
+    </style>
+  </head>
+  <body>
+
+  <script id="list-item-template" type="text/template">
+    <div class="list-item">
+      <a href="link">{{item.text}}</a>
+    </div>
+  </script>
+
+    <a id="back" href="mykids.html">
+      <img src="images/arrow-back-icon.png">
+    </a>
+    <div id="kid">
+      <img src="images/xavier.png">
+    </div>
+
+    <div id="rightpane">
+      <div id="messages"></div>
+    </div>
+
+    <div id="mapid"></div>
+
+    <!-- Scripts -->
+      <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+      <script type="text/javascript">
+
+      App = {};
+
+
+      App.init = (function() {
+        var lastKnown = {lat: 11.05, long: 105.09};
+        App.map = L.map('mapid', {zoomControl: false}).setView([lastKnown.lat, lastKnown.long], 7);
+        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '',
+          maxZoom: 18,
+        }).addTo(App.map);
+        setTimeout(App.resizeMap, 1);
+      })();
+
+      App.data = {
+        location: [{
+          "lat": 10.709797114802402,
+          "lon": 105.33215562691426,
+          "time": "2016-12-08T15:41:35.412Z"
+        }, {
+          "lat": 10.29651382767102,
+          "lon": 105.73727286453364,
+          "time": "2016-12-07T11:41:35.412Z"
+        }, {
+          "lat": 10.584736614037618,
+          "lon": 105.78181966390942,
+          "time": "2016-12-06T07:41:35.412Z"
+        }, {
+          "lat": 10.358069865773288,
+          "lon": 105.46792962756278,
+          "time": "2016-12-05T03:41:35.412Z"
+        }, {
+          "lat": 10.614101128457742,
+          "lon": 105.92195711504108,
+          "time": "2016-12-04T23:41:35.412Z"
+        }, {
+          "lat": 10.89422964626165,
+          "lon": 106.1795883479868,
+          "time": "2016-12-03T19:41:35.412Z"
+        }, {
+          "lat": 10.788037247049667,
+          "lon": 106.59048386984685,
+          "time": "2016-12-02T15:41:35.412Z"
+        }, {
+          "lat": 11.151025342183182,
+          "lon": 106.36867638314023,
+          "time": "2016-12-01T11:41:35.412Z"
+        }],
+        lastLocation: {
+          "contacts": [{
+            "name": "Ambulance",
+            "number": "111111"
+          }],
+          "lat": 11.05,
+          "lon": 105.09,
+          "time": "2016-12-09T07:41:35.412Z"
+        }
+      };
+
+
+      App.handlers = {
+        locationready: function(data) {
+            console.log('App.handlers.locationready', data);
+            data = data || App.data.location;
+
+            data.forEach(function (pos) {
+              var timeAgo = moment(pos.time).fromNow();
+              L.marker([pos.lat, pos.lon]).addTo(App.map).bindPopup("<b>" + timeAgo + "</b><br>Checked in.");
+              console.log(pos[0], pos[1]);
+            });
+
+          },
+        lastlocationready: function(data) {
+          console.log('App.handlers.lastlocationready', data);
+          var lastKnown = data || App.data.lastLocation;
+          App.map.setView([lastKnown.lat, lastKnown.lon], 7);
+
+          var circle = L.circle([lastKnown.lat, lastKnown.lon], {
+              color: 'red',
+              fillColor: '#f03',
+              fillOpacity: 0.5,
+              radius: 50000
+          }).addTo(App.map);
+          L.marker([lastKnown.lat, lastKnown.lon], {icon: L.icon({
+              iconUrl: 'images/red-marker-icon.png',
+              iconSize:     [25, 41], // size of the icon
+              iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+              popupAnchor:  [1, -45] // point from which the popup should open relative to the iconAnchor
+          })}).addTo(App.map).bindPopup("<b>" + moment(lastKnown.time).fromNow() + "</b><br>Checked in.");
+        }
+      };
+
+
+      // Call API
+      $ajax.get({
+        url: 'http://13.54.67.222:8080/rest/location/test',
+        dataType: 'json',
+        success: App.handlers.locationready
+      });
+
+      // Call API
+      $ajax.get({
+        url: 'http://13.54.67.222:8080/rest/lastLocation/test',
+        dataType: 'json',
+        success: App.handlers.lastlocationready
+      });
+
+      App.resizeMap = function() {
+        document.getElementById('mapid').style.width = window.innerWidth + 'px';
+        document.getElementById('mapid').style.height = window.innerHeight + 'px';
+      };
+
+      window.addEventListener("resize", App.resizeMap, false);
+
+      </script>
+  </body>
+</html>

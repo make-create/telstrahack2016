@@ -1,0 +1,280 @@
+<!DOCTYPE HTML>
+<!--
+  Eventually by HTML5 UP
+  html5up.net | @ajlkn
+  Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Happy Holidays TM - Settings</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+    <!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+    <!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css"/>
+    <script src="assets/js/moment.min.js"></script>
+    <script src="assets/js/vue.js"></script>
+    <script src="ajax.js"></script>
+    <style>
+    .card-format { background: #eee;padding: 20px; margin-bottom: 20px; }
+    #back { z-index: 99999; position: absolute; left: 20px; top: 20px; width: 80px; }
+    #back img {width: 100%;}
+    #directory .list-group {  padding: 10px 5%; }
+    #directory h4 { font-size: 26px; text-align: center; margin: 5px; }
+    #in-trouble ul { list-style-type: none; text-align: center;}
+    #in-trouble li { padding: 20px 0; }
+    #in-trouble img { border: 3px solid transparent; border-radius: 100px; width: 100%; margin-bottom: 10px; }
+    #in-trouble .in-trouble-danger { border: 3px solid red; }
+    #in-trouble .in-trouble-ok { border: 3px solid green; }
+    #send-sms { }
+    </style>
+  </head>
+  <body>
+
+<a id="back" class="hidden-xs" href="mykids.html">
+  <img src="images/arrow-back-icon.png">
+</a>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
+
+      <h2>In Trouble Override</h2>
+
+      <div id="in-trouble" class="card-format">
+
+        <p>Override current in-trouble settings.</p>
+
+        <div class="in-trouble-kids">
+          <ul class="row">
+            <li class="col-xs-2">
+              <img src="images/xavier.png" v-on:click="changeXavier" v-bind:class="{'in-trouble-danger' : xavier === 'danger'}">
+              Xavier ({{xavier}})
+            </li>
+            <li class="col-xs-1">
+            </li>
+            <li class="col-xs-2">
+              <img src="images/jenny.png" v-on:click="changeJenny" v-bind:class="{'in-trouble-danger' : jenny === 'danger'}">
+              Jenny ({{jenny}})
+            </li>
+          </ul>
+        </div>
+
+     </div>
+
+
+<script type="text/javascript">
+
+var inTrouble = new Vue({
+  el: '#in-trouble',
+  data: {
+    xavier: '',
+    jenny: ''
+  },
+  methods: {
+    changeXavier: function() {
+      console.log('changeXavier()');
+      var newStatus = this.xavier === 'danger' ? 'ok' : 'danger';
+      $ajax.post({
+        url: 'http://13.54.67.222:8080/rest/status/xavier/' + newStatus,
+        dataType: 'json',
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          this.xavier = data.status;
+          this.getXavier();
+        }).bind(this)
+      });
+      if (newStatus === 'danger') {
+        window.sms.send();
+      }
+    },
+    changeJenny: function() {
+      console.log('changeXavier()');
+      var newStatus = this.jenny === 'danger' ? 'ok' : 'danger';
+      $ajax.post({
+        url: 'http://13.54.67.222:8080/rest/status/jenny/' + newStatus,
+        dataType: 'json',
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          this.jenny = data.status;
+          this.getJenny();
+        }).bind(this)
+      });
+    },
+    getAll: function() {
+      this.getXavier();
+      this.getJenny();
+    },
+    getXavier: function() {
+      $ajax.get({
+        url: 'http://13.54.67.222:8080/rest/status/xavier',
+        dataType: 'json',
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          this.xavier = data.status;
+          console.log({xavier: this.xavier, jenny: this.jenny});
+        }).bind(this)
+      });
+    },
+    getJenny: function() {
+      $ajax.get({
+        url: 'http://13.54.67.222:8080/rest/status/jenny',
+        dataType: 'json',
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          this.jenny = data.status;
+          console.log({xavier: this.xavier, jenny: this.jenny});
+        }).bind(this)
+      });
+    }
+  }
+});
+
+inTrouble.getAll();
+
+
+
+</script>
+
+      <h2>Emergency Contacts</h2>
+
+
+    <div id="directory" class="card-format">
+      <p>These people will be notified if there is a problem.</p>
+      <div id="list-group">
+        <a href="javascript:;" class="list-group-item" v-for="subscriber in subscribers" v-on:click="remove(subscriber)">
+          <h4 class="list-group-item-heading">{{subscriber.Endpoint}}</h4>
+        </a>
+        <a href="javascript:;" class="list-group-item" v-on:click="add()">
+          <h4 class="list-group-item-heading">+ Add</h4>
+        </a>
+      </div>
+    </div>
+
+<script type="text/javascript">
+
+var directory = new Vue({
+  el: '#directory',
+  data: {
+    newPhone: undefined,
+    subscribers: []
+  },
+  methods: {
+    add: function() {
+      console.log('add', this.msg, arguments);
+      var number = prompt('What is the mobile number of the emergency contact? (ie +61496828222)');
+      console.log(number);
+      if (number.indexOf('+61') !== 0) {
+        return alert('Please enter a starting with +61');
+      }
+      $ajax.post({
+        url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/sms-manage-subscribers',
+        dataType: 'json',
+        data: {
+          Endpoint: number
+        },
+        success: (function(data) {
+          console.log('DONE', data);
+          this.getAll();
+        }).bind(this)
+      });
+    },
+    remove: function(subscriber) {
+      console.log('remove', this, arguments);
+      if (confirm('Remove emergency contact ' + subscriber.Endpoint + ' ?')) {
+        $ajax.delete({
+          url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/sms-manage-subscribers',
+          dataType: 'json',
+          data: {
+            SubscriptionArn: subscriber.SubscriptionArn
+          },
+          success: (function(data) {
+            console.log('DONE', data, directory);
+            this.getAll();
+          }).bind(this)
+        });
+      }
+    },
+    getAll: function() {
+      $ajax.get({
+        url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/sms-manage-subscribers',
+        dataType: 'json',
+        success: (function(data) {
+          console.log('DONE', data, directory);
+          directory.subscribers = data;
+          console.log('directory.subscribers', directory.subscribers);
+        }).bind(this)
+      });
+    }
+  }
+});
+
+directory.getAll();
+
+
+
+</script>
+
+           <h2>Notify everyone manually</h2>
+      <form id="send-sms" class="form-horizontal card-format" role="form" onsubmit="return false;">
+
+      <p>Write a SMS message to send to all subscribers</p>
+      <div class="form-group">
+        <label for="message" class="col-sm-2 control-label">Message</label>
+        <div class="col-sm-10">
+          <textarea id="message" class="form-control" rows="4" name="message" v-model="msg"></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-10 col-sm-offset-2">
+          <button class="btn btn-primary" v-on:click="send">Send</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-10 col-sm-offset-2">
+          {{status}}
+        </div>
+      </div>
+
+        </div>
+      </div>
+      </form>
+
+    </div>
+    <div class="col-sm-2"></div>
+
+<script type="text/javascript">
+
+
+var sms = new Vue({
+  el: '#send-sms',
+  data: {
+    msg: "Hello, we haven't heard back from Xavier for a while, check out this url for more info: http://bit.ly/2hfoV39.",
+    status: ''
+  },
+  methods: {
+    send: function() {
+      console.log('send', this.msg, arguments);
+      $ajax.post({
+        url: 'https://gfpf05dx25.execute-api.us-east-1.amazonaws.com/prod/send-sms-api',
+        dataType: 'json',
+        data: {
+          message: this.msg
+        },
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
+          if (typeof data === 'object') {
+            data = JSON.stringify(data);
+          }
+          this.status = data;
+        }).bind(this)
+      });
+    }
+  }
+})
+
+</script>
+  </body>
+</html>
