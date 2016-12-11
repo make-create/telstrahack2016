@@ -133,7 +133,7 @@ var inTrouble = new Vue({
     },
     getXavier: function() {
       $ajax.get({
-        url: 'http://192.168.43.7:8080/rest/status/xavier',
+        url: 'http://13.54.67.222:8080/rest/status/xavier',
         dataType: 'json',
         success: (function(data, opts) {
           console.log('DONE', opts.method, opts.url, data);
@@ -144,7 +144,7 @@ var inTrouble = new Vue({
     },
     getJenny: function() {
       $ajax.get({
-        url: 'http://192.168.43.7:8080/rest/status/jenny',
+        url: 'http://13.54.67.222:8080/rest/status/jenny',
         dataType: 'json',
         success: (function(data, opts) {
           console.log('DONE', opts.method, opts.url, data);
