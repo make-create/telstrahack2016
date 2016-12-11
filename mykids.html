@@ -20,13 +20,13 @@
     <style>
       body {
         background: #fff;
+        padding-top: 120px;
       }
       #logout { z-index: 99999; position: absolute; left: 20px; top: 20px; width: 80px; }
       #logout img {width: 100%;}
       .kids .in-trouble-danger { border: 3px solid red !important }
       .kids .in-trouble-ok { border: 3px solid green; }
       .kids {
-        max-width: 800px;
         margin: 0 auto;
       }
       .kids .row a {
@@ -42,6 +42,7 @@
       }
       .kids .row a img {
         width: 100%; 
+        text-align: center;
         margin-bottom: 10px;
         border: 3px solid transparent; border-radius: 100px; 
       }
@@ -49,6 +50,31 @@
         opacity: 0.7;
         -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
         filter: grayscale(100%);
+      }
+      .kids .row .message {
+        position: absolute;
+        display: block;
+        background: #b4e39c;
+        font-size: 16px;
+        font-weight: normal;
+        padding: 20px;
+        width: 100%;
+        top: -91px;
+        right: 0;
+        display: none;
+      }
+      .kids .row a:hover .message {
+        display: block;
+      }
+      @media screen and (max-width: 769px) {
+        .kids .row a img {
+          width: 80px;
+        }
+        .kids .row a {
+          width: 220px;
+          margin-bottom: 40px;
+          display: block;
+        }
       }
     </style>
   </head>
@@ -60,21 +86,23 @@
 
   <div id="in-trouble" class="kids">
     <div class="row">
-      <a class="col-xs-2" href="map.html">
+      <a class="col-sm-2"></a>
+      <a class="col-sm-2" href="map.html">
         <img src="images/xavier.png" v-bind:class="{'in-trouble-danger' : xavier === 'danger'}">
         Xavier
+        <p class="message" v-if="xavier !== 'danger'">Xavier is doing great</p>
       </a>
-      <a class="col-xs-2" disabled="disabled" v-bind:class="{'in-trouble-danger' : jenny === 'danger'}">
+      <a class="col-sm-2" disabled="disabled" v-bind:class="{'in-trouble-danger' : jenny === 'danger'}">
         <img src="images/jenny.png">
         Jenny
+        <p class="message" v-if="jenny !== 'danger'">Jenny is doing great</p>
       </a>
-      <a class="col-xs-2" href="settings.html">
+      <a class="col-sm-2" href="settings.html">
         <img src="images/gears.png">
         Settings
       </a>
-      <a class="col-xs-2"></a>
-      <a class="col-xs-2"></a>
-      <a class="col-xs-2"></a>
+      <a class="col-sm-2"></a>
+      <a class="col-sm-2"></a>
     </div>
   </div>
 
