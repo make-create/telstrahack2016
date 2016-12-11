@@ -263,8 +263,8 @@ var sms = new Vue({
         data: {
           message: this.msg
         },
-        success: (function(data) {
-          console.log('DONE',arguments);
+        success: (function(data, opts) {
+          console.log('DONE', opts.method, opts.url, data);
           if (typeof data === 'object') {
             data = JSON.stringify(data);
           }
