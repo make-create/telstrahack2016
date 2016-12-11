@@ -73,12 +73,6 @@ var inTrouble = new Vue({
     xavier: '',
     jenny: ''
   },
-  computed: {
-    dangerClass: function(name) {
-      console.log('dangerClass', arguments);
-      return this[name] === 'danger' ? 'in-trouble-danger' : 'in-trouble-ok';
-    }
-  },
   methods: {
     changeXavier: function() {
       console.log('changeXavier()');
